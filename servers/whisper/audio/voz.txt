@@ -1,7 +1,0 @@
- Neste projeto, eu criei três paredes separadas.
- Vou selecionar a parede à direita, em seguida, no Type-Selector.
- Eu vou mudá-la para a parede "Stake the Wall",
- "Break over", "CMU" with "Meral Stud".
- Em seguida, eu vou selecionar a parede do lado esquerdo,
- e em seguida, no Type-Selector, eu vou mudá-la para "Corton Wall 1".
- Finalmente, eu vou selecionar o muro e, novamente, expandir o Type-Selector.

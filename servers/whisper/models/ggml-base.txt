@@ -1,0 +1,1 @@
+Você deverá baixar o modelo (ggml-base.bin) e colocar nesta pasta (models) para que o Whisper funcione.
