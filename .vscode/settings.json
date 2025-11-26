@@ -1,0 +1,27 @@
+{
+    "editor.snippetSuggestions": "none",
+    "php.validate.executablePath": "/usr/bin/php",
+    "php.validate.enable": true,
+    "intelephense.licenceKey": "",
+    "intelephense.environment.includePaths": [
+        "vendor",
+        "src",
+        "app",
+        "tests"
+    ],
+    "intelephense.diagnostics.enable": true,
+    "intelephense.format.enable": true,
+    "php-cs-fixer.executablePath": "${workspaceFolder}/vendor/bin/php-cs-fixer",
+    "php-cs-fixer.rules": "@PSR12",
+    "php-cs-fixer.allowRisky": false,
+    "php-cs-fixer.autoFixBySave": true,
+    "php.namespaceResolver.autoSort": true,
+    "php.namespaceResolver.sortAlphabetically": true,
+    "codeium.enableCodeCompletion": true,
+    "codeium.enableLanguageServer": true,
+    "[php]": {
+        "editor.defaultFormatter": "bmewburn.vscode-intelephense-client",
+        "editor.formatOnSave": true
+    },
+    "editor.suggest.snippetsPreventQuickSuggestions": true
+}

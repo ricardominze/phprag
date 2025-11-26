@@ -1,0 +1,23 @@
+{
+    "version": "1.0.0",
+    "name": "ricardominze/phprag",
+    "description": "Exemplo de Aplicação RAG em PHP",
+    "require": {
+        "guzzlehttp/guzzle": "7.10"
+    },
+    "autoload": {
+        "files": [
+            "src/Utils/env.php"
+        ],
+        "psr-4": {
+            "App\\": "app/",
+            "PHPRag\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ricardo Minzé",
+            "email": "ricardominze@gmail.com"
+        }
+    ]
+}

@@ -1,0 +1,50 @@
+services:
+
+# OLLAMA
+
+  # ollama:
+  #   build: ./ollama
+  #   container_name: phprag-ollama
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+  #   restart: unless-stopped
+  #   networks:
+  #     - phprag-network
+
+# WISPHER
+
+  whisper:
+    build: ./servers/whisper
+    container_name: phprag-whisper
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./servers/whisper/audio:/app/audio
+      - ./servers/whisper/models:/app/models
+    restart: unless-stopped
+    networks:
+      - phprag-network
+
+# POSTGRES VECTOR
+
+  postgresvec:
+    image: pgvector/pgvector:pg16
+    container_name: phprag-postgres
+    environment:
+      POSTGRES_DB: phprag
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - 5431:5432
+    volumes:
+      - pgvector:/var/lib/postgresql/data
+
+volumes:
+  pgvector:
+
+networks:
+  phprag-network:
+    name: phprag-network
+    driver: bridge

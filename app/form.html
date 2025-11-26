@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PHP RAG</title>
+  <style>
+    /* ===== BASE ===== */
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #0b0f14;
+      color: #e8eef6;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    h1 {
+      margin: 20px 0;
+      color: #60a5fa;
+      text-align: center;
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+    }
+
+    /* ===== CONTAINER ===== */
+    .container {
+      flex: 1;
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    /* ===== FORM ===== */
+    form {
+      flex: 1;
+      width: 100%;
+      background: #111827;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-sizing: border-box;
+    }
+
+    label {
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    textarea {
+      width: 100%;
+      flex: 1;
+      border-radius: 12px;
+      border: 1px solid #374151;
+      background: #0b1220;
+      color: #e8eef6;
+      padding: 12px;
+      font-size: 1rem;
+      resize: none;
+      min-height: 120px;
+      box-sizing: border-box;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 12px 20px;
+      transition: 0.2s;
+      font-size: 1rem;
+    }
+
+    button.secondary {
+      background: #374151;
+      color: white;
+    }
+
+    button.recording {
+      background: #dc2626 !important;
+    }
+
+    button.send {
+      background: #2563eb;
+      color: white;
+    }
+
+    button.remove {
+      background: #7f1d1d;
+      color: #fff;
+      padding: 10px 16px;
+      font-size: 0.9rem;
+    }
+
+    button:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    /* ===== ÁUDIO ===== */
+    .audio-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+      width: 100%;
+      margin-top: 16px;
+      max-width: 1000px;
+    }
+
+    audio {
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    /* ===== RESPOSTA ===== */
+    .response-box {
+      width: 100%;
+      max-width: 1000px;
+      margin-top: 24px;
+      background: #0b1220;
+      border: 1px solid #1f2937;
+      border-radius: 12px;
+      padding: 16px;
+      font-family: monospace;
+      color: #a5f3fc;
+      display: none;
+      box-sizing: border-box;
+      overflow: auto;
+      max-height: 50vh;
+      word-break: break-all;
+    }
+
+    .response-box pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 8px;
+      padding: 10px;
+      color: #22c55e;
+    }
+
+    .response-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #60a5fa;
+    }
+
+    .success {
+      color: #22c55e;
+    }
+
+    .error {
+      color: #ef4444;
+    }
+
+    .download-link {
+      color: #60a5fa;
+      text-decoration: underline;
+      display: none;
+      word-break: break-all;
+    }
+
+    /* ===== LOADER ===== */
+    .loader {
+      display: none;
+      margin: 10px 0;
+      width: 32px;
+      height: 32px;
+      border: 4px solid rgba(96, 165, 250, 0.2);
+      border-top-color: #60a5fa;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ===== RESPONSIVIDADE ===== */
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+
+      form {
+        padding: 16px;
+      }
+
+      .actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .response-box {
+        max-height: 40vh;
+      }
+    }
+
+    @media (max-width: 480px) {
+      textarea {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🧠 PHP RAG</h1>
+  <div class="container">
+    <form id="uploadForm" action="/submit" method="POST" enctype="multipart/form-data">
+      <label for="text">Mensagem (texto)</label>
+      <textarea id="text" name="text" placeholder="Digite aqui..."></textarea>
+
+      <div class="actions">
+        <button type="button" id="btnRecord" class="secondary">🎙️ Gravar Áudio</button>
+        <button type="button" id="btnSend" class="send">Enviar</button>
+      </div>
+    </form>
+
+    <div class="audio-controls" id="audioControls" style="display:none;">
+      <audio id="preview" controls></audio>
+      <button type="button" class="remove" id="btnRemoveAudio">🗑️ Remover Áudio</button>
+    </div>
+
+    <!-- Área da resposta -->
+    <div id="responseArea" class="response-box">
+      <div class="response-title">Resposta do Servidor:</div>
+
+      <!-- Loader animado -->
+      <div id="loader" class="loader"></div>
+
+      <pre id="responseText"></pre>
+
+      <audio id="responseAudio" controls style="margin-top:12px; display:none;"></audio>
+      <a id="downloadLink" class="download-link" download="resposta.mp3">⬇️ Baixar áudio</a>
+    </div>
+  </div>
+
+  <script>
+    const btnRecord = document.getElementById('btnRecord');
+    const btnSend = document.getElementById('btnSend');
+    const btnRemove = document.getElementById('btnRemoveAudio');
+    const audioControls = document.getElementById('audioControls');
+    const preview = document.getElementById('preview');
+    const responseArea = document.getElementById('responseArea');
+    const responseText = document.getElementById('responseText');
+    const responseAudio = document.getElementById('responseAudio');
+    const downloadLink = document.getElementById('downloadLink');
+    const loader = document.getElementById('loader');
+
+    let mediaRecorder;
+    let chunks = [];
+    let audioBlob = null;
+
+    /* -------- GRAVAÇÃO DE ÁUDIO -------- */
+
+    btnRecord.addEventListener('click', async () => {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        btnRecord.textContent = '🎙️ Gravar Áudio';
+        btnRecord.classList.remove('recording');
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        chunks = [];
+
+        mediaRecorder.ondataavailable = e => chunks.push(e.data);
+        mediaRecorder.onstop = () => {
+          audioBlob = new Blob(chunks, { type: 'audio/webm' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+          preview.src = audioUrl;
+          audioControls.style.display = 'flex';
+        };
+
+        mediaRecorder.start();
+        btnRecord.textContent = '⏹️ Parar Gravação';
+        btnRecord.classList.add('recording');
+      } catch (err) {
+        alert('Erro ao acessar microfone: ' + err.message);
+      }
+    });
+
+    btnRemove.addEventListener('click', () => {
+      audioBlob = null;
+      preview.src = '';
+      audioControls.style.display = 'none';
+    });
+
+    /* -------- STREAMING COM FETCH -------- */
+
+    btnSend.addEventListener('click', async () => {
+      const fd = new FormData();
+      fd.append('text', document.getElementById('text').value || '');
+      if (audioBlob) fd.append('audio', audioBlob, 'gravacao.webm');
+
+      responseArea.style.display = "block";
+      responseText.textContent = "";
+      responseAudio.style.display = "none";
+      downloadLink.style.display = "none";
+
+      loader.style.display = "block"; // mostra a animação
+
+      try {
+        const res = await fetch('/submit', {
+          method: 'POST',
+          body: fd
+        });
+
+        const contentType = res.headers.get("Content-Type") || "";
+
+        // Caso seja áudio
+        if (contentType.includes("audio/")) {
+          loader.style.display = "none";
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          responseAudio.src = url;
+          responseAudio.style.display = "block";
+          downloadLink.href = url;
+          downloadLink.style.display = "inline";
+          try { await responseAudio.play(); } catch { }
+          return;
+        }
+
+        // Streaming textual
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          responseText.textContent += chunk;
+          responseText.scrollTop = responseText.scrollHeight;
+        }
+
+        loader.style.display = "none";
+        responseText.className = "success";
+
+      } catch (err) {
+        loader.style.display = "none";
+        responseText.textContent = "⚠️ Erro no stream: " + err.message;
+        responseText.className = "error";
+      }
+    });
+  </script>
+
+</body>
+
+</html>
