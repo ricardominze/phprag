@@ -11,20 +11,6 @@ use PHPRag\Services\VectorIngestService;
 use PHPRag\Services\VectorSearchService;
 use PHPRag\Services\WhisperService;
 
-########################
-# INGESTAO DE DOCUMENTO
-########################
-
-/*
-$embed = new EmbeddingService();
-$ingest = new VectorIngestService();
-$filePath = __DIR__ . '/../docs/regras_futebol.pdf';
-
-$embedChunks = $embed->embedPdf($filePath);
-$ingest->ingest(\basename($filePath), \basename($filePath), 'Regras do Futebol', $embedChunks);
-*/
-
-
 ####################
 # BUSCA NO DOCUMENTO
 ####################

@@ -84,6 +84,7 @@ $server->on("request", function ($req, $res) {
       $res->header("Content-Type", "audio/mpeg");
       $res->header("Content-Disposition", 'inline; filename="converted.mp3"');
       $res->end(file_get_contents($tmpOutput));
+
     } else {
 
       $embed = new EmbeddingService();
@@ -137,6 +138,8 @@ $server->on("request", function ($req, $res) {
         }
       );
     }
+    
+    return;
   }
 
   echo "[WARN] Rota desconhecida: {$path}\n";

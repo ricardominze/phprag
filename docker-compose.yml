@@ -2,16 +2,18 @@ services:
 
 # OLLAMA
 
-  # ollama:
-  #   build: ./ollama
-  #   container_name: phprag-ollama
-  #   ports:
-  #     - "11434:11434"
-  #   volumes:
-  #     - ollama_data:/root/.ollama
-  #   restart: unless-stopped
-  #   networks:
-  #     - phprag-network
+  ollama:
+    image: ollama/ollama:latest
+    container_name: phprag-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    networks:
+      - phprag-network
 
 # WISPHER
 
@@ -37,12 +39,37 @@ services:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
     ports:
-      - 5431:5432
+      - 5432:5432
     volumes:
       - pgvector:/var/lib/postgresql/data
+    networks:
+      - phprag-network
+
+# PHP
+
+  php:
+      build: ./servers/php
+      container_name: phprag-swoole
+      restart: unless-stopped
+      ports:
+        - "9501:9501"
+      volumes:
+        - ./:/app
+        - ./php/php.ini:/usr/local/etc/php/php.ini
+      environment:
+        DB_HOST: phprag-postgres
+        DB_PORT: 5432
+        DB_NAME: phprag
+        DB_USER: root
+        DB_PASS: root
+      networks:
+        - phprag-network
+      depends_on:
+        - postgresvec   
 
 volumes:
   pgvector:
+  ollama-data:
 
 networks:
   phprag-network:
