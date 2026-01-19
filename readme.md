@@ -19,8 +19,8 @@ Este projeto foi desenvolvido com o objetivo de estudar e aplicar, de forma prá
 - <img src="./assets/docker.png" width="30"> **Docker**  
   - Tecnologia de conteinerização de maquinas virtuais.
 
-- <img src="./assets/postgres.png" width="30"> **Postgres**  
-  - Tecnologia de conteinerização de maquinas virtuais.
+- <img src="./assets/postgres.png" width="30"> **PostgreSQL**  
+  - Banco de dados com suporte a vetorização (pgvector).
 
 - <img src="./assets/ollama.png" width="30"> **Ollama**  
   - Container de LLMs.
